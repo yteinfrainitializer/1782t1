@@ -1,0 +1,54 @@
+version: '3.6'
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: postgres
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: yte-demo-app
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    restart: always
+
+  redis:
+    image: redis
+    container_name: redis
+    ports:
+      - "6379:6379"
+    restart: always
+
+  zookeeper:
+    image: zookeeper:3.6
+    container_name: zookeeper
+    ports:
+      - "2181:2181"
+    restart: always
+
+  kafka:
+    image: bitnami/kafka:3.2.3
+    container_name: kafka
+    ports:
+      - "9092:9092"
+    environment:
+      KAFKA_CFG_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_LISTENERS: LOCAL://:9092
+      KAFKA_ADVERTISED_LISTENERS: LOCAL://localhost:9092
+      KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP: LOCAL:PLAINTEXT
+      KAFKA_CFG_INTER_BROKER_LISTENER_NAME: LOCAL
+    depends_on:
+      - zookeeper
+    restart: always
+
+  kafka-manager:
+    image: hlebalbau/kafka-manager:stable
+    container_name: kafka-manager
+    ports:
+      - "9000:9000"
+    environment:
+      ZK_HOSTS: zookeeper:2181
+    restart: always
+
+volumes:
+  pgdata:
