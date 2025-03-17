@@ -29,6 +29,8 @@ components:
       env:
         - name: DEBUG_PORT
           value: '5858'
+        - name: MAVEN_OPTS
+          value: "-Daether.connector.https.securityMode=insecure -Dmaven.repo.local=/home/user/.m2/repository"
   - name: postgres
     container:
       image: postgres:16-alpine
@@ -109,7 +111,7 @@ commands:
     exec:
       component: app
       workingDir: ${PROJECT_SOURCE}
-      commandLine: 'mvn -Dmaven.repo.local=/home/user/.m2/repository package -Dmaven.test.skip=true'
+      commandLine: 'mvn package -Dmaven.test.skip=true'
       group:
         kind: build
         isDefault: true
